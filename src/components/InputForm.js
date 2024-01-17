@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import moment from "moment";
+
 
 const InputForm = ({ addTodo, updateTodo, initialData }) => {
   const [formData, setFormData] = useState(initialData);
@@ -19,6 +21,8 @@ const InputForm = ({ addTodo, updateTodo, initialData }) => {
     }));
   };
 
+
+
   const handleSubmit = (event) => {
     event.preventDefault();
     if (formData.id === -1) {
@@ -30,7 +34,7 @@ const InputForm = ({ addTodo, updateTodo, initialData }) => {
       id: -1,
       title: "",
       description: "",
-      deadline: 0,
+      deadline: moment().format("DD-MM-YYYY hh:mm:ss"),
       completed: false,
     });
   };

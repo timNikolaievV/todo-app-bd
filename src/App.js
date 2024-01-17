@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import InputForm from "./components/InputForm";
 import TodoList from "./components/TodoList";
-import TodoDetail from "./components/TodoDetail";
+import moment from "moment";
 import TodoEdit from "./components/TodoEdit";
 import UserForm from "./components/UserForm";
 
@@ -9,7 +9,7 @@ function App() {
   const [token, setToken] = useState(null);
   const [todos, setTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState(null);
-
+  const clockShift = 1704067200000;
   // Fetch todos on component mount
   useEffect(() => {
     if (token) {
@@ -31,8 +31,13 @@ function App() {
         },
       });
       const data = await response.json();
-      console.log(data);
-      setTodos(data);
+      const data2 = [];
+      data.forEach((element) => {
+        element.deadline = moment(new Date(element.deadline + clockShift)).format("DD-MM-YYYY hh:mm:ss");
+        data2.push(element);
+      });
+      console.log(data2);
+      setTodos(data2);
     } catch (error) {
       console.error("Error fetching todos:", error);
     }
@@ -41,6 +46,8 @@ function App() {
   // Create a new todo
   const addTodo = async (todoData) => {
     try {
+      const dt = moment(todoData.deadline, "DD-MM-YYYY hh:mm:ss").toDate();
+      todoData.deadline = dt.getTime() - clockShift;
       const response = await fetch("http://localhost:8008/todos", {
         method: "POST",
         headers: {
@@ -49,7 +56,9 @@ function App() {
         },
         body: JSON.stringify(todoData),
       });
+
       const data = await response.json();
+      data.deadline = moment(new Date(data.deadline + clockShift)).format("DD-MM-YYYY hh:mm:ss");
       setTodos([...todos, data]);
     } catch (error) {
       console.error("Error adding todo:", error);
@@ -59,6 +68,8 @@ function App() {
   // Update an existing todo
   const updateTodo = async (todoData) => {
     try {
+      const dt = moment(todoData.deadline, "DD-MM-YYYY hh:mm:ss").toDate();
+      todoData.deadline = dt.getTime() - clockShift;
       const response = await fetch(
         `http://localhost:8008/todos/${todoData.id}`,
         {
@@ -71,6 +82,7 @@ function App() {
         }
       );
       const updatedTodo = await response.json();
+      updatedTodo.deadline = moment(new Date(updatedTodo.deadline + clockShift)).format("DD-MM-YYYY hh:mm:ss");
       const updatedTodos = todos.map((todo) =>
         todo.id === updatedTodo.id ? updatedTodo : todo
       );
@@ -147,7 +159,7 @@ function App() {
               id: -1,
               title: "",
               description: "",
-              deadline: 0,
+              deadline: moment().format("DD-MM-YYYY hh:mm:ss"),
               completed: false,
             }}
           />
