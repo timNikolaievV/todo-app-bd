@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 const UserForm = ({ registerUser, loginUser, initialData }) => {
   const [formData, setFormData] = useState(initialData);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -42,7 +43,7 @@ const UserForm = ({ registerUser, loginUser, initialData }) => {
         <label>
           Password:
           <input
-            type="text"
+            type={showPassword ? "text" : "password"}
             name="password"
             value={formData.password}
             onChange={handleInputChange}
